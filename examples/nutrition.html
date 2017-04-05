@@ -71,15 +71,51 @@ d3.tsv('data/food-data.txt', function(data) {
         "niacin", "folate", "pantothenic acid", "vitamin C (ascorbic acid)", "vitamin D (calciferol)", "vitamin E activity", "id", "record has changed",
         "phosphorus (P)", "iron (Fe)", "iodide (I)", "zinc (Zn)", "potassium (K)", "sodium (Na)","vitamin A activity", "energy kcal",
         "beta-carotene", "vitamin B1 (thiamine)", "vitamin B2 (riboflavin)", "vitamin B6 (pyridoxine)", "vitamin B12 (cobalamin)", NaN]) */
-    .dimensions({
+    /*.dimensions({
         "energy kJ": {type: "number"},
         "protein": {type:"number"},
         "carbohydrates, available": {type: "number", title: "carbohydrates"},
         "fat, total": {type:"number", title: "fat"},
         "dietary fibres": {type: "number"},
-        "alcohol": {type:"number"},
-        "water": {type:"number"},
+        "starch": {type: "number"},
+        "sugars": {type: "number"},
+        "dietary fibres": {type: "number"},
+        "fat, total": {type: "number"},
+        "cholesterol": {type: "number"},
+        "fatty acids, monounsaturated": {type: "number"},
+        "fatty acids, saturated": {type: "number"},
+        "fatty acids, polyunsaturated ": {type: "number"},
     })
+      .dimensions({
+          "vitamin A activity": {type: "number", title: "A"},
+          "all-trans retinol equivalents": {type: "number", title: "Retinol"},
+          "beta-carotene": {type: "number", title: "BC"},
+          "vitamin B1 (thiamine)": {type: "number", title: "B1"},
+          "vitamin B2 (riboflavin)": {type: "number", title: "B2"},
+          "vitamin B6 (pyridoxine)": {type: "number", title:"B6"},
+          "vitamin B12 (cobalamin)": {type: "number", title: "B12"},
+          "niacin": {type: "number"},
+          "folate": {type: "number"},
+          "pantothenic acid": {type: "number"},
+          "vitamin C (ascorbic acid)": {type: "number", title: "C"},
+        "vitamin D (calciferol)": {type: "number", title: "D"},
+        "vitamin E activity": {type: "number"},
+        "sodium (Na)": {type: "number"},
+        "potassium (K)": {type: "number"},
+        "chloride (Cl)": {type: "number"},
+        "calcium (Ca)": {type: "number"},
+        "magnesium (Mg)": {type: "number"},
+        "phosphorus (P)": {type: "number"},
+        "iron (Fe)": {type: "number"},
+        "iodide (I)": {type: "number"},
+        "zinc (Zn)": {type: "number"},
+      })
+      */
+      .dimensions({
+              "sodium (Na)": {type: "number"},
+          "energy kJ": {type: "number"},
+          "fat, total": {type:"number", title: "fat"},
+      })
     .render()
     .reorderable()
     .brushMode("1D-axes");
