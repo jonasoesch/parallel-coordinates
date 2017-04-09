@@ -1,15 +1,11 @@
 (function(global) {
-global.helpers = global.helpers || {};
-exports = global.helpers;
+global.swissFoodHelpers = global.swissFoodHelpers || {};
+exports = global.swissFoodHelpers;
 
 /**
  * Extracts and adds the producer's name to the food object. The producer's name is extracted from
- * the german name ('name D' column). For all foods that do not have a producer specified in braces
+ * the german name ('name D' column). For all foods that do not have a producer specified 
  * the producer's name is set to null.
- * Use this function e.g. as the converions funciton in a call to d3's dsv functions.
- * E.g. d3.csv('branded_foods.csv', addProducerInfo, ...)
- * @param {Object} d The food object.
- * @returns {Object} The food object that was given as a parameter.
  */
 var addProducerName = function(d) {
     var producerName;
@@ -49,11 +45,12 @@ var addProducerName = function(d) {
         d.producerName = null;
     }
     return d;
+
+    function reformatName(name) {
+        return name.trim().toLowerCase();
+    }
 };
 
-function reformatName(name) {
-    return name.trim().toLowerCase();
-}
 
 /**
  * Calculates the number of foods per producer.
@@ -80,7 +77,6 @@ var calcFoodsPerProducer = function(data) {
  * belong to that producer.
  */
 var getProducerToFoodsMapping = function(data) {
-
     var producers = {};
     data.forEach(function(item, idx, array) {
         if (item.producerName === undefined)
@@ -96,11 +92,7 @@ var getProducerToFoodsMapping = function(data) {
 
 };
 
-/**
- * Adds multiple category properties to the foods object depending on the number of category 
- * hierarchies (separated by ';') and categories (separated by '/') provided for the food.
- */
-var addCategories = function(food) {
+var augmentWithCategories = function(food) {
     var categoryString = food['category E'];
     var categoryHierarchies = categoryString.split(';');
     categoryHierarchies.forEach(function(hierarchyString, idx1, hierarchies) {
@@ -112,33 +104,55 @@ var addCategories = function(food) {
     return food;
 };
 
-var calcFoodsPerCategory = function(foods) {
-    var foodsPerCategory = [];
-    foods.forEach(function(food) {
-        if (food.categoryHierarchies === undefined || food.categoryHierarchies === []) {
-            throw new Error("The object property 'categoryHierarchies' is not set on this food or is empty.");
-        }
-        food.categoryHierarchies.forEach(function(hierarchy) {
-            
-            hierarchy.forEach(function(category, hierarchyLvl) {
-                // If this category hierarchy level was not yet used, create a new one.
-                if (foodsPerCategory[hierarchyLvl] === undefined) {
-                    foodsPerCategory[hierarchyLvl] = {};
+var augmentWithCategoriesList = function(food) {
+    var categories = [];
+    food['category E'].split(';').forEach(function(hierarchy) {
+        hierarchy.split('/').forEach(function(category) {
+            categories.push(category);
+        });
+    });
+    food.categories = categories;
+    return food;
+};
+
+var getAllCategoriesCounted = function(foods) {
+    var categories = [new Map(), new Map(), new Map()];
+    foods.forEach(function(food, idx) {
+        var categoryHierarchies = food['category E'].split(';');
+        categoryHierarchies.forEach(function(hierarchyString, idx1) {
+            hierarchyString.split('/').forEach(function(category, idx2) {
+                if (categories[idx2].has(category)) {
+                    categories[idx2].set(category, categories[idx2].get(category) + 1);
+                } else {
+                    categories[idx2].set(category, 0);
                 }
-                // If the category appears the first time add it to the categories object.
-                if (foodsPerCategory[hierarchyLvl][category] === undefined) {
-                    foodsPerCategory[hierarchyLvl][category] = 0;
-                }
-                foodsPerCategory[hierarchyLvl][category] += 1;
             });
         });
     });
-    return foodsPerCategory;
+    return categories;
+};
+
+var getAllCategoriesAsTree = function(foods) {
+  var root = new Map();
+  foods.forEach(function(food) {
+    food['category E'].split(';').forEach(function(hierarchy) {
+      var categories = hierarchy.split('/');
+      categories.forEach(function(category, idx, categories) {
+        let node = getTreeNode(root, categories, idx);
+        if (!node.has(category)) {
+          node.set(category, new Map());
+        }
+      });
+    });
+  });
+  return root;
 };
 
 exports.addProducerName = addProducerName;
 exports.calcFoodsPerProducer = calcFoodsPerProducer;
 exports.getProducerToFoodsMapping = getProducerToFoodsMapping;
-exports.addCategories = addCategories;
-exports.calcFoodsPerCategory = calcFoodsPerCategory;
+exports.augmentWithCategories = augmentWithCategories;
+exports.augmentWithCategoriesList = augmentWithCategoriesList;
+exports.getAllCategoriesCounted = getAllCategoriesCounted;
+exports.getAllCategoriesAsTree = getAllCategoriesAsTree;
 }(this));
