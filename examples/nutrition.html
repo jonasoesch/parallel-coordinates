@@ -72,7 +72,7 @@ d3.tsv('data/food-data.txt', function(data) {
         "phosphorus (P)", "iron (Fe)", "iodide (I)", "zinc (Zn)", "potassium (K)", "sodium (Na)","vitamin A activity", "energy kcal",
         "beta-carotene", "vitamin B1 (thiamine)", "vitamin B2 (riboflavin)", "vitamin B6 (pyridoxine)", "vitamin B12 (cobalamin)", NaN]) */
     .dimensions({
-        "energy kJ": {type: "number"},
+        "energy kJ": {type: "number", title: "kJ"},
         "protein": {type:"number"},
         "sugars": {type: "number", title: "sugar"},
         "starch": {type: "number", title: "starch"},
