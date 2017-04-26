@@ -1,5 +1,6 @@
 /**
- * Genrates a file with the category structure of the swiss food data.
+ * Run this script to generate a file with the category structure of the swiss 
+ * food data.
  */
 
 var fs = require('fs');

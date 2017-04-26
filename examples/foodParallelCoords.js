@@ -25,18 +25,22 @@ function filterByCategories(data, included, excluded) {
   });
 }
 
-function processData(data) {
+d3.tsv('data/food-data.txt', preprocess, function (data) {
 
+  // Add categories to be included and categories to be excluded.
+  // E.g. include 'Fruit' but exclude 'Dried Fruit'.
   var includedCategories = ['Fruit'];
-  var excludedCategories = [];
+  var excludedCategories = ['Cooked fruit (incl. cans)'];
   data = filterByCategories(data, includedCategories, excludedCategories);
 
-  // set up coloring configuration
+  // Set up categorial coloring.
+  // Add category names to this list to make the lines belonging to food of these 
+  // categories be colored (per category).
   var colorCategories = [
     'Fresh fruit', 
     'Dried fruit', 
-    'Fruit juices', 
-    'Cooked fruit (incl. cans)'];
+    'Fruit juices'];
+
   var colorScale = d3.scale.category10()
     .domain(colorCategories);
 
@@ -47,17 +51,16 @@ function processData(data) {
   // slickgrid needs each data element to have an id
   data.forEach(function(d,i) { d.id = d.id || i;});
 
-  // var dimensions = {
+  // All dimensions available with their units.
+  var dimensions = {
   //   "energy kJ": {type: "number"},
-  //   "water": {type:"number", title:"water (g)"},
-  //   "protein": {type:"number", title: "protein (g)"},
-  //   "carbohydrates, available": {type: "number", title: "carbohydrates"}, 
-  //   "fat, total": {type:"number", title: "fat (g)"},
-  //   "dietary fibres": {type: "number"},
-  //   "starch": {type: "number", title: "starch (g)"},
-  //   "sugars": {type: "number", title: "sugars (g)"},
-  //   "dietary fibres": {type: "number", title: "dietary fibres (g)"},
-  //   "fat, total": {type: "number"},
+    "water": {type:"number", title:"water (g)"},
+    "protein": {type:"number", title: "protein (g)"},
+    "carbohydrates, available": {type: "number", title: "carbohydrates (g)"}, 
+    "fat, total": {type:"number", title: "fat (g)"},
+    "starch": {type: "number", title: "starch (g)"},
+    "sugars": {type: "number", title: "sugars (g)"},
+    "dietary fibres": {type: "number", title: "dietary fibres (g)"},
   //   "cholesterol": {type: "number", title: "cholesterol (mg)"}, 
   //   "vitamin A activity": {type: "number", title: "A (ug RE)"},
   //   "all-trans retinol equivalents": {type: "number", title: "all-trans RE"},
@@ -81,42 +84,20 @@ function processData(data) {
   //   "iron (Fe)": {type: "number", title:"Fe (mg)"},
   //   "iodide (I)": {type: "number", title: "I (ug)"},
   //   "zinc (Zn)": {type: "number", title: "Zn (mg)"}
-  // };
+  };
 
   parcoords
     .data(data)
-    .dimensions({
-      "energy kJ": {type: "number"},
-      // "protein": {type:"number", title: "protein (g)"},
-      // "carbohydrates, available": {type: "number", title: "carbohydrates"}, 
-      "water": {type:"number", title:"water (g)"},
-      // "fat, total": {type:"number", title: "fat (g)"},
-      "dietary fibres": {type: "number", title: "dietary fibres (g)"},
-      // "starch": {type: "number", title: "starch (g)"},
-      "sugars": {type: "number", title: "sugars (g)"},
-      // "cholesterol": {type: "number", title: "cholesterol (mg)"},
-      "vitamin A activity": {type: "number", title: "A (ug RE)"},
-      // "all-trans retinol equivalents": {type: "number", title: "all-trans RE"},
-      "beta-carotene": {type: "number", title: "BC (ug)"},
-      "vitamin B1 (thiamine)": {type: "number", title: "B1 (mg)"},
-      "vitamin B2 (riboflavin)": {type: "number", title: "B2 (mg)"},
-      "vitamin B6 (pyridoxine)": {type: "number", title:"B6 (mg)"},
-      // "vitamin B12 (cobalamin)": {type: "number", title: "B12 (ug)"},  
-      "niacin": {type: "number", title: "niacin (mg)"},
-      "folate": {type: "number", title: "folate (ug)"},
-      "pantothenic acid": {type: "number", title: "Pantothenic acid (mg)"},
-      "vitamin C (ascorbic acid)": {type: "number", title: "C (mg)"},
-      // "vitamin D (calciferol)": {type: "number", title: "D (ug)"},
-      "vitamin E activity": {type: "number"}
-    })
+    .dimensions(dimensions)
     .color(byCategory)
     .render()
     .reorderable()
     .brushMode("1D-axes");
 
+  // The columns that will be shown in the Slick.DataView table.
+  var column_keys = ['name D', 'category 1/1', 'category 1/2', 'categories'];
   // For the swiss food data only the first two category hierarchies and in each 
   // of them only the first two categories are useful.
-  var column_keys = ['name D', 'category 1/1', 'category 1/2', 'categories'];
   // var column_keys = ['name D', 'category 1/1', 'category 1/2', 'category 2/1', 'category 2/2', 'categories'];
   var columns = column_keys.map(function(key,i) {
     return {
@@ -203,16 +184,4 @@ function processData(data) {
     dataView.setItems(data);
     dataView.endUpdate();
   }
-}
-
-// load csv file and create the chart
-d3.tsv(
-  'data/food-data.txt', 
-  preprocess,
-  processData);
-
-  // var allOriginalColumns = "ID", "ID V 4.0", "ID SwissFIR", "name D", "synonyms D", "name F", "synonyms F", "name I", "synonyms I", "unit",
-  //     "name E", "synonyms E", "category D", "category F", "category I", "category E", "specific gravity", "matrix unit", "value type", "source",
-  //     "niacin", "folate", "pantothenic acid", "vitamin C (ascorbic acid)", "vitamin D (calciferol)", "vitamin E activity", "id", "record has changed",
-  //     "phosphorus (P)", "iron (Fe)", "iodide (I)", "zinc (Zn)", "potassium (K)", "sodium (Na)","vitamin A activity", "energy kcal",
-  //     "beta-carotene", "vitamin B1 (thiamine)", "vitamin B2 (riboflavin)", "vitamin B6 (pyridoxine)", "vitamin B12 (cobalamin)", NaN]);
+});
